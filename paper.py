@@ -187,52 +187,24 @@ class ArxivPaper:
         llm = get_llm()
 
         # Create a comprehensive prompt for article generation
-        prompt = """You are a scientific writing expert. Based on the provided paper content, write a comprehensive article that introduces the paper's key points, contributions, and significance. The article should be informative, well-structured, and accessible to researchers in the field.
-
-Paper Title: __TITLE__
+        prompt = """Paper Title: __TITLE__
 
 Paper Abstract: __ABSTRACT__
 
 Full Paper Content: __CONTENT__
 
-Please write a detailed article in __LANG__ that covers:
-1. The main problem or research question addressed
-2. Key contributions and novel approaches
-3. Methodology and technical details (if applicable)
-4. Important findings and results
-5. Significance and potential impact
-
-The article should be approximately 200-400 words, well-organized with clear paragraphs, and written in an engaging academic style."""
+Please write in __LANG__:"""
 
         prompt = prompt.replace('__LANG__', llm.lang)
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
         prompt = prompt.replace('__CONTENT__', full_content)
 
-        # Use tokenizer for content management - increase limit for detailed articles
-        enc = tiktoken.encoding_for_model("gpt-4o")
-        prompt_tokens = enc.encode(prompt)
-
-        # Use a higher token limit for more comprehensive content
-        max_tokens = 8000  # Increased from 4000 to allow for more detailed content
-        if len(prompt_tokens) > max_tokens:
-            # If content is too long, prioritize title, abstract, and truncate full content
-            content_tokens = enc.encode(full_content)
-            available_tokens = max_tokens - len(enc.encode(prompt.replace('__CONTENT__', '')))
-
-            if available_tokens > 0:
-                truncated_content_tokens = content_tokens[:available_tokens]
-                truncated_content = enc.decode(truncated_content_tokens)
-                prompt = prompt.replace('__CONTENT__', truncated_content)
-            else:
-                # If still too long, use only abstract
-                prompt = prompt.replace('__CONTENT__', self.summary)
-
         article = llm.generate(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert scientific writer who creates comprehensive, informative articles about research papers. Your articles are well-structured, engaging, and provide deep insights into the paper's contributions and significance.",
+                    "content": "仔细阅读这篇论文，并写一篇文章介绍该论文的关键点。",
                 },
                 {"role": "user", "content": prompt},
             ]
@@ -244,44 +216,3 @@ The article should be approximately 200-400 words, well-organized with clear par
         """Backward compatibility - returns the article content."""
         return self.article
 
-    @cached_property
-    def affiliations(self) -> Optional[list[str]]:
-        if self.tex is not None:
-            content = self.tex.get("all")
-            if content is None:
-                content = "\n".join(self.tex.values())
-            #search for affiliations
-            possible_regions = [r'\\author.*?\\maketitle',r'\\begin{document}.*?\\begin{abstract}']
-            matches = [re.search(p, content, flags=re.DOTALL) for p in possible_regions]
-            match = next((m for m in matches if m), None)
-            if match:
-                information_region = match.group(0)
-            else:
-                logger.debug(f"Failed to extract affiliations of {self.arxiv_id}: No author information found.")
-                return None
-            prompt = f"Given the author information of a paper in latex format, extract the affiliations of the authors in a python list format, which is sorted by the author order. If there is no affiliation found, return an empty list '[]'. Following is the author information:\n{information_region}"
-            # use gpt-4o tokenizer for estimation
-            enc = tiktoken.encoding_for_model("gpt-4o")
-            prompt_tokens = enc.encode(prompt)
-            prompt_tokens = prompt_tokens[:4000]  # truncate to 4000 tokens
-            prompt = enc.decode(prompt_tokens)
-            llm = get_llm()
-            affiliations = llm.generate(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an assistant who perfectly extracts affiliations of authors from the author information of a paper. You should return a python list of affiliations sorted by the author order, like ['TsingHua University','Peking University']. If an affiliation is consisted of multi-level affiliations, like 'Department of Computer Science, TsingHua University', you should return the top-level affiliation 'TsingHua University' only. Do not contain duplicated affiliations. If there is no affiliation found, you should return an empty list [ ]. You should only return the final list of affiliations, and do not return any intermediate results.",
-                    },
-                    {"role": "user", "content": prompt},
-                ]
-            )
-
-            try:
-                affiliations = re.search(r'\[.*?\]', affiliations, flags=re.DOTALL).group(0)
-                affiliations = eval(affiliations)
-                affiliations = list(set(affiliations))
-                affiliations = [str(a) for a in affiliations]
-            except Exception as e:
-                logger.debug(f"Failed to extract affiliations of {self.arxiv_id}: {e}")
-                return None
-            return affiliations
