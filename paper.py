@@ -213,21 +213,6 @@ The article should be approximately 200-400 words, well-organized with clear par
         enc = tiktoken.encoding_for_model("gpt-4o")
         prompt_tokens = enc.encode(prompt)
 
-        # Use a higher token limit for more comprehensive content
-        max_tokens = 8000  # Increased from 4000 to allow for more detailed content
-        if len(prompt_tokens) > max_tokens:
-            # If content is too long, prioritize title, abstract, and truncate full content
-            content_tokens = enc.encode(full_content)
-            available_tokens = max_tokens - len(enc.encode(prompt.replace('__CONTENT__', '')))
-
-            if available_tokens > 0:
-                truncated_content_tokens = content_tokens[:available_tokens]
-                truncated_content = enc.decode(truncated_content_tokens)
-                prompt = prompt.replace('__CONTENT__', truncated_content)
-            else:
-                # If still too long, use only abstract
-                prompt = prompt.replace('__CONTENT__', self.summary)
-
         article = llm.generate(
             messages=[
                 {
