@@ -59,47 +59,47 @@ def get_empty_html():
   """
   return block_template
 
-def get_block_html(title:str, authors:str, rate:str,arxiv_id:str, abstract:str, pdf_url:str, code_url:str=None, affiliations:str=None):
+def get_block_html(title:str, authors:str, rate:str,arxiv_id:str, article:str, pdf_url:str, code_url:str=None, affiliations:str=None):
     code = f'<a href="{code_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #5bc0de; padding: 8px 16px; border-radius: 4px; margin-left: 8px;">Code</a>' if code_url else ''
     block_template = """
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9; margin-bottom: 16px;">
     <tr>
-        <td style="font-size: 20px; font-weight: bold; color: #333;">
+        <td style="font-size: 20px; font-weight: bold; color: #333; padding-bottom: 8px;">
             {title}
         </td>
     </tr>
     <tr>
-        <td style="font-size: 14px; color: #666; padding: 8px 0;">
-            {authors}
+        <td style="font-size: 14px; color: #666; padding: 4px 0;">
+            <strong>Authors:</strong> {authors}
             <br>
-            <i>{affiliations}</i>
+            <span style="color: #888; font-size: 12px;"><strong>Affiliations:</strong> <i>{affiliations}</i></span>
         </td>
     </tr>
     <tr>
         <td style="font-size: 14px; color: #333; padding: 8px 0;">
-            <strong>Relevance:</strong> {rate}
+            <strong>Relevance:</strong> {rate} &nbsp;&nbsp;&nbsp; <strong>arXiv ID:</strong> {arxiv_id}
         </td>
     </tr>
     <tr>
-        <td style="font-size: 14px; color: #333; padding: 8px 0;">
-            <strong>arXiv ID:</strong> {arxiv_id}
-        </td>
-    </tr>
-    <tr>
-        <td style="font-size: 14px; color: #333; padding: 8px 0;">
-            <strong>TLDR:</strong> {abstract}
+        <td style="font-size: 14px; color: #555; padding: 12px 0; line-height: 1.6; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 8px 0;">
+            <div style="background-color: #fff; padding: 12px; border-radius: 4px; border-left: 4px solid #5bc0de;">
+                <strong style="color: #333; font-size: 15px;">📄 Paper Summary</strong>
+                <div style="margin-top: 8px; text-align: justify;">
+                    {article}
+                </div>
+            </div>
         </td>
     </tr>
 
     <tr>
-        <td style="padding: 8px 0;">
-            <a href="{pdf_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 8px 16px; border-radius: 4px;">PDF</a>
+        <td style="padding: 12px 0;">
+            <a href="{pdf_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 10px 20px; border-radius: 4px;">📄 Read PDF</a>
             {code}
         </td>
     </tr>
 </table>
 """
-    return block_template.format(title=title, authors=authors,rate=rate,arxiv_id=arxiv_id, abstract=abstract, pdf_url=pdf_url, code=code, affiliations=affiliations)
+    return block_template.format(title=title, authors=authors,rate=rate,arxiv_id=arxiv_id, article=article, pdf_url=pdf_url, code=code, affiliations=affiliations)
 
 def get_stars(score:float):
     full_star = '<span class="full-star">⭐</span>'
@@ -136,7 +136,7 @@ def render_email(papers:list[ArxivPaper]):
                 affiliations += ', ...'
         else:
             affiliations = 'Unknown Affiliation'
-        parts.append(get_block_html(p.title, authors,rate,p.arxiv_id ,p.tldr, p.pdf_url, p.code_url, affiliations))
+        parts.append(get_block_html(p.title, authors,rate,p.arxiv_id ,p.article, p.pdf_url, p.code_url, affiliations))
         time.sleep(10)
 
     content = '<br>' + '</br><br>'.join(parts) + '</br>'

@@ -148,57 +148,101 @@ class ArxivPaper:
         return file_contents
     
     @cached_property
-    def tldr(self) -> str:
-        introduction = ""
-        conclusion = ""
+    def article(self) -> str:
+        """Generate a detailed article about the paper's key points using the full paper content."""
+        full_content = ""
+
+        # Get the full paper content
         if self.tex is not None:
             content = self.tex.get("all")
             if content is None:
                 content = "\n".join(self.tex.values())
-            #remove cite
+
+            # Clean up the content
+            # Remove citations
             content = re.sub(r'~?\\cite.?\{.*?\}', '', content)
-            #remove figure
+            # Remove figure environments but keep captions
             content = re.sub(r'\\begin\{figure\}.*?\\end\{figure\}', '', content, flags=re.DOTALL)
-            #remove table
+            # Remove table environments but keep captions
             content = re.sub(r'\\begin\{table\}.*?\\end\{table\}', '', content, flags=re.DOTALL)
-            #find introduction and conclusion
-            # end word can be \section or \end{document} or \bibliography or \appendix
-            match = re.search(r'\\section\{Introduction\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
-            if match:
-                introduction = match.group(0)
-            match = re.search(r'\\section\{Conclusion\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
-            if match:
-                conclusion = match.group(0)
+            # Remove equation environments (keep inline math)
+            content = re.sub(r'\\begin\{equation\}.*?\\end\{equation\}', '', content, flags=re.DOTALL)
+            content = re.sub(r'\\begin\{align\}.*?\\end\{align\}', '', content, flags=re.DOTALL)
+            # Remove bibliography and appendix sections
+            content = re.sub(r'\\bibliography\{.*?\}.*$', '', content, flags=re.DOTALL)
+            content = re.sub(r'\\appendix.*$', '', content, flags=re.DOTALL)
+            # Clean up LaTeX commands that don't add content value
+            content = re.sub(r'\\[a-zA-Z]+\*?\{[^}]*\}', ' ', content)  # Remove most LaTeX commands
+            content = re.sub(r'\\[a-zA-Z]+\*?', ' ', content)  # Remove LaTeX commands without braces
+            # Clean up formatting
+            content = re.sub(r'\s+', ' ', content)  # Normalize whitespace
+            content = content.strip()
+
+            full_content = content
+
+        # If no LaTeX content available, use the abstract
+        if not full_content.strip():
+            full_content = self.summary
+
         llm = get_llm()
-        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary in __LANG__:
-        
-        \\title{__TITLE__}
-        \\begin{abstract}__ABSTRACT__\\end{abstract}
-        __INTRODUCTION__
-        __CONCLUSION__
-        """
+
+        # Create a comprehensive prompt for article generation
+        prompt = """You are a scientific writing expert. Based on the provided paper content, write a comprehensive article that introduces the paper's key points, contributions, and significance. The article should be informative, well-structured, and accessible to researchers in the field.
+
+Paper Title: __TITLE__
+
+Paper Abstract: __ABSTRACT__
+
+Full Paper Content: __CONTENT__
+
+Please write a detailed article in __LANG__ that covers:
+1. The main problem or research question addressed
+2. Key contributions and novel approaches
+3. Methodology and technical details (if applicable)
+4. Important findings and results
+5. Significance and potential impact
+
+The article should be approximately 200-400 words, well-organized with clear paragraphs, and written in an engaging academic style."""
+
         prompt = prompt.replace('__LANG__', llm.lang)
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
-        prompt = prompt.replace('__INTRODUCTION__', introduction)
-        prompt = prompt.replace('__CONCLUSION__', conclusion)
+        prompt = prompt.replace('__CONTENT__', full_content)
 
-        # use gpt-4o tokenizer for estimation
+        # Use tokenizer for content management - increase limit for detailed articles
         enc = tiktoken.encoding_for_model("gpt-4o")
         prompt_tokens = enc.encode(prompt)
-        prompt_tokens = prompt_tokens[:4000]  # truncate to 4000 tokens
-        prompt = enc.decode(prompt_tokens)
-        
-        tldr = llm.generate(
+
+        # Use a higher token limit for more comprehensive content
+        max_tokens = 8000  # Increased from 4000 to allow for more detailed content
+        if len(prompt_tokens) > max_tokens:
+            # If content is too long, prioritize title, abstract, and truncate full content
+            content_tokens = enc.encode(full_content)
+            available_tokens = max_tokens - len(enc.encode(prompt.replace('__CONTENT__', '')))
+
+            if available_tokens > 0:
+                truncated_content_tokens = content_tokens[:available_tokens]
+                truncated_content = enc.decode(truncated_content_tokens)
+                prompt = prompt.replace('__CONTENT__', truncated_content)
+            else:
+                # If still too long, use only abstract
+                prompt = prompt.replace('__CONTENT__', self.summary)
+
+        article = llm.generate(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an assistant who perfectly summarizes scientific paper, and gives the core idea of the paper to the user.",
+                    "content": "You are an expert scientific writer who creates comprehensive, informative articles about research papers. Your articles are well-structured, engaging, and provide deep insights into the paper's contributions and significance.",
                 },
                 {"role": "user", "content": prompt},
             ]
         )
-        return tldr
+        return article
+
+    @cached_property
+    def tldr(self) -> str:
+        """Backward compatibility - returns the article content."""
+        return self.article
 
     @cached_property
     def affiliations(self) -> Optional[list[str]]:

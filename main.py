@@ -114,7 +114,7 @@ if __name__ == '__main__':
     add_argument(
         "--use_llm_api",
         type=bool,
-        help="Use OpenAI API to generate TLDR",
+        help="Use OpenAI API to generate article summaries",
         default=False,
     )
     add_argument(
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     add_argument(
         "--language",
         type=str,
-        help="Language of TLDR",
+        help="Language of article summaries",
         default="English",
     )
     parser.add_argument('--debug', action='store_true', help='Debug mode')
