@@ -59,7 +59,7 @@ def get_empty_html():
   """
   return block_template
 
-def get_block_html(title:str, authors:str, rate:str,arxiv_id:str, article:str, pdf_url:str, code_url:str=None):
+def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, entry_id:str, code_url:str=None):
     code = f'<a href="{code_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #5bc0de; padding: 8px 16px; border-radius: 4px; margin-left: 8px;">Code</a>' if code_url else ''
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9; margin-bottom: 16px;">
@@ -97,7 +97,7 @@ def get_block_html(title:str, authors:str, rate:str,arxiv_id:str, article:str, p
     </tr>
 </table>
 """
-    return block_template.format(title=title, authors=authors,rate=rate,arxiv_id=arxiv_id, article=article, pdf_url=pdf_url, code=code)
+    return block_template.format(title=title, authors=authors, rate=rate, arxiv_id=arxiv_id, article=article, entry_id=entry_id, code=code)
 
 def get_stars(score:float):
     full_star = '<span class="full-star">⭐</span>'
@@ -127,7 +127,7 @@ def render_email(papers:list[ArxivPaper]):
         authors = ', '.join(authors)
         if len(p.authors) > 5:
             authors += ', ...'
-        parts.append(get_block_html(p.title, authors,rate,p.arxiv_id ,p.article, p.pdf_url, p.code_url))
+        parts.append(get_block_html(p.title, authors, rate, p.arxiv_id, p.article, p.entry_id, p.code_url))
         time.sleep(10)
 
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
@@ -139,7 +139,7 @@ def send_email(sender:str, receiver:str, password:str,smtp_server:str,smtp_port:
         return formataddr((Header(name, 'utf-8').encode(), addr))
 
     msg = MIMEText(html, 'html', 'utf-8')
-    msg['From'] = _format_addr('Github Action <%s>' % sender)
+    msg['From'] = _format_addr('Arxiv Daily <%s>' % sender)
     msg['To'] = _format_addr('You <%s>' % receiver)
     today = datetime.datetime.now().strftime('%Y/%m/%d')
     msg['Subject'] = Header(f'Daily arXiv {today}', 'utf-8').encode()

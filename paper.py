@@ -37,8 +37,8 @@ class ArxivPaper:
         return re.sub(r'v\d+$', '', self._paper.get_short_id())
     
     @property
-    def pdf_url(self) -> str:
-        return self._paper.pdf_url
+    def entry_id(self) -> str:
+        return self._paper.entry_id
     
     @cached_property
     def code_url(self) -> Optional[str]:
@@ -204,7 +204,7 @@ Please write in __LANG__:"""
             messages=[
                 {
                     "role": "system",
-                    "content": "仔细阅读这篇论文，并写一篇文章介绍该论文的关键点,800字以内。",
+                    "content": "仔细阅读这篇论文，并写一篇文章介绍该论文的关键点,600字以内。",
                 },
                 {"role": "user", "content": prompt},
             ]
