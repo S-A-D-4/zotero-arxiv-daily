@@ -91,7 +91,7 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
 
     <tr>
         <td style="padding: 12px 0;">
-            <a href="{arxiv_id}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 10px 20px; border-radius: 4px;">📄 Read PDF</a>
+            <a href="{entry_id}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #d9534f; padding: 10px 20px; border-radius: 4px;">📄 Read PDF</a>
             {code}
         </td>
     </tr>
