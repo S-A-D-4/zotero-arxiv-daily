@@ -237,7 +237,7 @@ class ArxivPaper:
 
         if paper_type == PaperType.SOLUTION_TYPE:
             # 解决方案型论文的提示词
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并按照以下结构生成论文介绍：需要解决的问题、现有方案的缺点、新方案的创新点。每个部分都要简明扼要，总字数控制在600字以内。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并按照以下结构生成论文介绍：需要解决的问题、现有方案的缺点、新方案的创新点。每个部分都要简明扼要，总字数控制在500字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
@@ -257,7 +257,7 @@ class ArxivPaper:
 
         elif paper_type == PaperType.EXPLORATORY_TYPE:
             # 探究型论文的提示词
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并按照以下结构生成论文介绍：探究的问题、实验结论。每个部分都要简明扼要，总字数控制在600字以内。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并按照以下结构生成论文介绍：探究的问题、实验结论。每个部分都要简明扼要，总字数控制在500字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
