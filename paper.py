@@ -12,13 +12,21 @@ from loguru import logger
 import tiktoken
 from contextlib import ExitStack
 from urllib.error import HTTPError
+from enum import Enum
 
+
+class PaperType(Enum):
+    """论文类型枚举"""
+    SOLUTION_TYPE = "solution"      # 解决方案型：提出新方法、算法或框架
+    EXPLORATORY_TYPE = "exploratory"  # 探究型：实验分析、数据探索或理论验证
+    UNKNOWN = "unknown"             # 未知类型
 
 
 class ArxivPaper:
     def __init__(self,paper:arxiv.Result):
         self._paper = paper
         self.score = None
+        self._paper_type = None  # 缓存论文类型
     
     @property
     def title(self) -> str:
@@ -39,7 +47,45 @@ class ArxivPaper:
     @property
     def entry_id(self) -> str:
         return self._paper.entry_id
-    
+
+    @cached_property
+    def paper_type(self) -> PaperType:
+        """识别论文类型：解决方案型或探究型"""
+        if self._paper_type is not None:
+            return self._paper_type
+
+        try:
+            llm = get_llm()
+
+            # 准备论文内容用于分类
+            tex_content = None
+            if self.tex and self.tex.get("all"):
+                tex_content = self.tex.get("all")
+
+            # 使用LLM专用分类方法
+            classification_result = llm.classify_paper_type(
+                title=self.title,
+                abstract=self.summary,
+                content=tex_content
+            )
+
+            # 根据分类结果设置论文类型
+            if classification_result == "solution":
+                self._paper_type = PaperType.SOLUTION_TYPE
+                logger.info(f"Paper {self.arxiv_id} classified as SOLUTION_TYPE")
+            elif classification_result == "exploratory":
+                self._paper_type = PaperType.EXPLORATORY_TYPE
+                logger.info(f"Paper {self.arxiv_id} classified as EXPLORATORY_TYPE")
+            else:
+                self._paper_type = PaperType.UNKNOWN
+                logger.warning(f"Paper {self.arxiv_id} classified as {classification_result}, defaulting to UNKNOWN")
+
+        except Exception as e:
+            logger.error(f"Error classifying paper {self.arxiv_id}: {e}")
+            self._paper_type = PaperType.UNKNOWN
+
+        return self._paper_type
+
     @cached_property
     def code_url(self) -> Optional[str]:
         s = requests.Session()
@@ -186,27 +232,64 @@ class ArxivPaper:
 
         llm = get_llm()
 
-        # Create a comprehensive prompt for article generation
-        prompt = """Paper Title: __TITLE__
+        # 根据论文类型生成不同格式的摘要
+        paper_type = self.paper_type
 
-Paper Abstract: __ABSTRACT__
+        if paper_type == PaperType.SOLUTION_TYPE:
+            # 解决方案型论文的提示词
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并按照以下结构生成论文介绍：需要解决的问题、现有方案的缺点、新方案的创新点。每个部分都要简明扼要，总字数控制在600字以内。"
+            user_prompt = f"""论文标题：{self.title}
 
-Full Paper Content: __CONTENT__
+论文摘要：{self.summary}
 
-Please write in __LANG__:"""
+论文完整内容：{full_content}
 
-        prompt = prompt.replace('__LANG__', llm.lang)
-        prompt = prompt.replace('__TITLE__', self.title)
-        prompt = prompt.replace('__ABSTRACT__', self.summary)
-        prompt = prompt.replace('__CONTENT__', full_content)
+请按照以下格式生成论文介绍：
+
+**需要解决的问题**
+（明确说明论文要解决的核心问题）
+
+**现有方案的缺点**
+（分析当前存在方法或方案的不足）
+
+**新方案的创新点**
+（突出论文提出的新方法的创新之处）"""
+
+        elif paper_type == PaperType.EXPLORATORY_TYPE:
+            # 探究型论文的提示词
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并按照以下结构生成论文介绍：探究的问题、实验结论。每个部分都要简明扼要，总字数控制在600字以内。"
+            user_prompt = f"""论文标题：{self.title}
+
+论文摘要：{self.summary}
+
+论文完整内容：{full_content}
+
+请按照以下格式生成论文介绍：
+
+**探究的问题**
+（描述论文要研究或验证的问题）
+
+**实验结论**
+（总结实验结果和发现）"""
+
+        else:
+            # 未知类型或回退到原始格式
+            system_prompt = "仔细阅读这篇论文，并写一篇文章介绍该论文的关键点,600字以内。"
+            user_prompt = f"""Paper Title: {self.title}
+
+Paper Abstract: {self.summary}
+
+Full Paper Content: {full_content}
+
+Please write in {llm.lang}:"""
 
         article = llm.generate(
             messages=[
                 {
                     "role": "system",
-                    "content": "仔细阅读这篇论文，并写一篇文章介绍该论文的关键点,600字以内。",
+                    "content": system_prompt
                 },
-                {"role": "user", "content": prompt},
+                {"role": "user", "content": user_prompt},
             ]
         )
         return article

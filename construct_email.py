@@ -59,13 +59,37 @@ def get_empty_html():
   """
   return block_template
 
-def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, entry_id:str, code_url:str=None):
+def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, entry_id:str, code_url:str=None, paper_type=None):
     code = f'<a href="{code_url}" style="display: inline-block; text-decoration: none; font-size: 14px; font-weight: bold; color: #fff; background-color: #5bc0de; padding: 8px 16px; border-radius: 4px; margin-left: 8px;">Code</a>' if code_url else ''
+
+    # 根据论文类型设置标签和颜色
+    type_label = ""
+    type_color = "#5bc0de"  # 默认蓝色
+    if paper_type == "solution":
+        type_label = '<span style="display: inline-block; padding: 4px 8px; background-color: #28a745; color: white; font-size: 12px; font-weight: bold; border-radius: 3px; margin-left: 8px;">解决方案型</span>'
+        type_color = "#28a745"  # 绿色
+    elif paper_type == "exploratory":
+        type_label = '<span style="display: inline-block; padding: 4px 8px; background-color: #fd7e14; color: white; font-size: 12px; font-weight: bold; border-radius: 3px; margin-left: 8px;">探究型</span>'
+        type_color = "#fd7e14"  # 橙色
+
+    # 处理结构化摘要格式
+    formatted_article = article
+    if "**需要解决的问题**" in article or "**探究的问题**" in article:
+        # 新的结构化格式，转换为HTML
+        formatted_article = article.replace("**需要解决的问题**", '<strong style="color: #007bff; font-size: 16px;">🎯 需要解决的问题</strong>')
+        formatted_article = formatted_article.replace("**现有方案的缺点**", '<strong style="color: #dc3545; font-size: 16px;">⚠️ 现有方案的缺点</strong>')
+        formatted_article = formatted_article.replace("**新方案的创新点**", '<strong style="color: #28a745; font-size: 16px;">💡 新方案的创新点</strong>')
+        formatted_article = formatted_article.replace("**探究的问题**", '<strong style="color: #fd7e14; font-size: 16px;">🔍 探究的问题</strong>')
+        formatted_article = formatted_article.replace("**实验结论**", '<strong style="color: #6f42c1; font-size: 16px;">📊 实验结论</strong>')
+        # 将换行符转换为HTML换行
+        formatted_article = formatted_article.replace('\n\n', '<br><br>')
+        formatted_article = formatted_article.replace('\n', '<br>')
+
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9; margin-bottom: 16px;">
     <tr>
         <td style="font-size: 20px; font-weight: bold; color: #333; padding-bottom: 8px;">
-            {title}
+            {title}{type_label}
         </td>
     </tr>
     <tr>
@@ -80,10 +104,10 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
     </tr>
     <tr>
         <td style="font-size: 14px; color: #555; padding: 12px 0; line-height: 1.6; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 8px 0;">
-            <div style="background-color: #fff; padding: 12px; border-radius: 4px; border-left: 4px solid #5bc0de;">
-                <strong style="color: #333; font-size: 15px;">📄 Paper Summary</strong>
+            <div style="background-color: #fff; padding: 12px; border-radius: 4px; border-left: 4px solid {type_color};">
+                <strong style="color: #333; font-size: 15px;">📄 Paper Analysis</strong>
                 <div style="margin-top: 8px; text-align: justify;">
-                    {article}
+                    {formatted_article}
                 </div>
             </div>
         </td>
@@ -97,7 +121,18 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
     </tr>
 </table>
 """
-    return block_template.format(title=title, authors=authors, rate=rate, arxiv_id=arxiv_id, article=article, entry_id=entry_id, code=code)
+    return block_template.format(
+        title=title,
+        authors=authors,
+        rate=rate,
+        arxiv_id=arxiv_id,
+        article=article,
+        formatted_article=formatted_article,
+        entry_id=entry_id,
+        code=code,
+        type_label=type_label,
+        type_color=type_color
+    )
 
 def get_stars(score:float):
     full_star = '<span class="full-star">⭐</span>'
@@ -127,7 +162,16 @@ def render_email(papers:list[ArxivPaper]):
         authors = ', '.join(authors)
         if len(p.authors) > 5:
             authors += ', ...'
-        parts.append(get_block_html(p.title, authors, rate, p.arxiv_id, p.article, p.entry_id, p.code_url))
+
+        # 获取论文类型，确保向后兼容
+        paper_type_value = None
+        try:
+            if hasattr(p, 'paper_type') and p.paper_type:
+                paper_type_value = p.paper_type.value
+        except Exception as e:
+            logger.warning(f"Error getting paper type for {p.arxiv_id}: {e}")
+
+        parts.append(get_block_html(p.title, authors, rate, p.arxiv_id, p.article, p.entry_id, p.code_url, paper_type_value))
         time.sleep(10)
 
     content = '<br>' + '</br><br>'.join(parts) + '</br>'
