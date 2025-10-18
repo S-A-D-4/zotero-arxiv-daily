@@ -260,7 +260,7 @@ class ArxivPaper:
 （填充：说明新方案的具体实现方法和关键技术）
 </div>
 
-请直接输出HTML，在填充部分可以使用合适美观的HTML标签组织内容。"""
+请直接输出HTML代码，在填充部分可以使用合适美观的HTML标签格式组织内容。"""
 
         elif paper_type == PaperType.EXPLORATORY_TYPE:
             # 探究型论文的提示词 - 输出HTML格式
@@ -282,7 +282,7 @@ class ArxivPaper:
 （填充：总结实验结果和发现）
 </div>
 
-请直接输出HTML，在填充部分可以使用合适美观的HTML标签组织内容。"""
+请直接输出HTML代码，在填充部分可以使用合适美观的HTML标签格式组织内容。"""
 
         else:
             # 未知类型或回退到HTML格式
