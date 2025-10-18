@@ -247,17 +247,17 @@ class ArxivPaper:
 请生成HTML格式的论文分析，包含以下结构：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #dc3545; font-size: 16px; margin-bottom: 8px;">⚠️ 现有方案的缺点</h3>
-<p>（分析当前存在方法或方案的不足）</p>
+（分析当前存在方法或方案的不足）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #007bff; font-size: 16px; margin-bottom: 8px;">💡 新方案的设计理念</h3>
-<p>（阐述新方案的核心思想和设计原则）</p>
+（阐述新方案的核心思想和设计原则）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #28a745; font-size: 16px; margin-bottom: 8px;">🔧 新方案的实现方式</h3>
-<p>（说明新方案的具体实现方法和关键技术）</p>
+（说明新方案的具体实现方法和关键技术）
 </div>
 
 请直接输出HTML内容，不要包含任何markdown格式标记。"""
@@ -274,12 +274,12 @@ class ArxivPaper:
 请生成HTML格式的论文分析，包含以下结构：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #fd7e14; font-size: 16px; margin-bottom: 8px;">🔍 探究的问题</h3>
-<p>（描述论文要研究或验证的问题）</p>
+（描述论文要研究或验证的问题）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 8px;">📊 实验结论</h3>
-<p>（总结实验结果和发现）</p>
+（总结实验结果和发现）
 </div>
 
 请直接输出HTML内容，不要包含任何markdown格式标记。"""
@@ -296,7 +296,7 @@ class ArxivPaper:
 请生成HTML格式的论文摘要：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #333; font-size: 16px; margin-bottom: 8px;">📄 论文摘要</h3>
-<p>（请在这里生成论文的摘要内容）</p>
+（请在这里生成论文的摘要内容）
 </div>
 
 请使用{llm.lang}输出，并直接输出HTML内容，不要包含任何markdown格式标记。"""
