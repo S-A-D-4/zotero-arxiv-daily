@@ -74,11 +74,11 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
 
     # 处理结构化摘要格式
     formatted_article = article
-    if "**需要解决的问题**" in article or "**探究的问题**" in article:
+    if "**现有方案的缺点**" in article or "**探究的问题**" in article:
         # 新的结构化格式，转换为HTML
-        formatted_article = article.replace("**需要解决的问题**", '<strong style="color: #007bff; font-size: 16px;">🎯 需要解决的问题</strong>')
-        formatted_article = formatted_article.replace("**现有方案的缺点**", '<strong style="color: #dc3545; font-size: 16px;">⚠️ 现有方案的缺点</strong>')
-        formatted_article = formatted_article.replace("**新方案的创新点**", '<strong style="color: #28a745; font-size: 16px;">💡 新方案的创新点</strong>')
+        formatted_article = article.replace("**现有方案的缺点**", '<strong style="color: #dc3545; font-size: 16px;">⚠️ 现有方案的缺点</strong>')
+        formatted_article = formatted_article.replace("**新方案的设计理念**", '<strong style="color: #007bff; font-size: 16px;">💡 新方案的设计理念</strong>')
+        formatted_article = formatted_article.replace("**新方案的实现方式**", '<strong style="color: #28a745; font-size: 16px;">🔧 新方案的实现方式</strong>')
         formatted_article = formatted_article.replace("**探究的问题**", '<strong style="color: #fd7e14; font-size: 16px;">🔍 探究的问题</strong>')
         formatted_article = formatted_article.replace("**实验结论**", '<strong style="color: #6f42c1; font-size: 16px;">📊 实验结论</strong>')
         # 将换行符转换为HTML换行
