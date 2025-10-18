@@ -44,9 +44,12 @@ class ArxivPaper:
     def arxiv_id(self) -> str:
         return re.sub(r'v\d+$', '', self._paper.get_short_id())
     
-    @property
+    @cached_property
     def entry_id(self) -> str:
-        return self._paper.entry_id
+        # 移除版本号，生成不带版本的链接
+        original_id = self._paper.entry_id
+        # 匹配各种格式中的版本号：v1, v2, v10等
+        return re.sub(r'v\d+$', '',original_id)
 
     @cached_property
     def paper_type(self) -> PaperType:
