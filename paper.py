@@ -236,52 +236,70 @@ class ArxivPaper:
         paper_type = self.paper_type
 
         if paper_type == PaperType.SOLUTION_TYPE:
-            # 解决方案型论文的提示词
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并按照以下结构抽取论文内容：现有方案的缺点、新方案的设计理念、新方案的实现方式。每个部分都要简明易懂，总字数控制在500字左右。"
+            # 解决方案型论文的提示词 - 输出HTML格式
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要。请使用合适的HTML标签来组织内容，包括标题、段落、列表等。每个部分都要简明易懂，总字数控制在500字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
 
 论文完整内容：{full_content}
 
-请按照以下格式抽取论文内容：
+请生成HTML格式的论文分析，包含以下结构：
+<div style="margin-bottom: 20px;">
+<h3 style="color: #dc3545; font-size: 16px; margin-bottom: 8px;">⚠️ 现有方案的缺点</h3>
+<p>（分析当前存在方法或方案的不足）</p>
+</div>
 
-**现有方案的缺点**
-（分析当前存在方法或方案的不足）
+<div style="margin-bottom: 20px;">
+<h3 style="color: #007bff; font-size: 16px; margin-bottom: 8px;">💡 新方案的设计理念</h3>
+<p>（阐述新方案的核心思想和设计原则）</p>
+</div>
 
-**新方案的设计理念**
-（阐述新方案的核心思想和设计原则）
+<div style="margin-bottom: 20px;">
+<h3 style="color: #28a745; font-size: 16px; margin-bottom: 8px;">🔧 新方案的实现方式</h3>
+<p>（说明新方案的具体实现方法和关键技术）</p>
+</div>
 
-**新方案的实现方式**
-（说明新方案的具体实现方法和关键技术）"""
+请直接输出HTML内容，不要包含任何markdown格式标记。"""
 
         elif paper_type == PaperType.EXPLORATORY_TYPE:
-            # 探究型论文的提示词
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并按照以下结构抽取论文内容：探究的问题、实验结论。每个部分都要简明易懂，总字数控制在400字左右。"
+            # 探究型论文的提示词 - 输出HTML格式
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要。请使用合适的HTML标签来组织内容，包括标题、段落、列表等。每个部分都要简明易懂，总字数控制在400字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
 
 论文完整内容：{full_content}
 
-请按照以下格式抽取论文内容：
+请生成HTML格式的论文分析，包含以下结构：
+<div style="margin-bottom: 20px;">
+<h3 style="color: #fd7e14; font-size: 16px; margin-bottom: 8px;">🔍 探究的问题</h3>
+<p>（描述论文要研究或验证的问题）</p>
+</div>
 
-**探究的问题**
-（描述论文要研究或验证的问题）
+<div style="margin-bottom: 20px;">
+<h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 8px;">📊 实验结论</h3>
+<p>（总结实验结果和发现）</p>
+</div>
 
-**实验结论**
-（总结实验结果和发现）"""
+请直接输出HTML内容，不要包含任何markdown格式标记。"""
 
         else:
-            # 未知类型或回退到原始格式
-            system_prompt = "仔细阅读这篇论文，并写一篇文章介绍该,600字以内。"
-            user_prompt = f"""Paper Title: {self.title}
+            # 未知类型或回退到HTML格式
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇论文，并生成HTML格式的摘要。请使用合适的HTML标签来组织内容，包括标题、段落等。总字数控制在600字以内。"
+            user_prompt = f"""论文标题：{self.title}
 
-Paper Abstract: {self.summary}
+论文摘要：{self.summary}
 
-Full Paper Content: {full_content}
+论文完整内容：{full_content}
 
-Please write in {llm.lang}:"""
+请生成HTML格式的论文摘要：
+<div style="margin-bottom: 20px;">
+<h3 style="color: #333; font-size: 16px; margin-bottom: 8px;">📄 论文摘要</h3>
+<p>（请在这里生成论文的摘要内容）</p>
+</div>
+
+请使用{llm.lang}输出，并直接输出HTML内容，不要包含任何markdown格式标记。"""
 
         article = llm.generate(
             messages=[

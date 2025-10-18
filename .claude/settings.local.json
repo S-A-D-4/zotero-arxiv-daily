@@ -3,7 +3,8 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(openspec:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

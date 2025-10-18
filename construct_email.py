@@ -72,18 +72,8 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
         type_label = '<span style="display: inline-block; padding: 4px 8px; background-color: #fd7e14; color: white; font-size: 12px; font-weight: bold; border-radius: 3px; margin-left: 8px;">探究型</span>'
         type_color = "#fd7e14"  # 橙色
 
-    # 处理结构化摘要格式
+    # 现在article已经是HTML格式，直接使用
     formatted_article = article
-    if "**现有方案的缺点**" in article or "**探究的问题**" in article:
-        # 新的结构化格式，转换为HTML
-        formatted_article = article.replace("**现有方案的缺点**", '<strong style="color: #dc3545; font-size: 16px;">⚠️ 现有方案的缺点</strong>')
-        formatted_article = formatted_article.replace("**新方案的设计理念**", '<strong style="color: #007bff; font-size: 16px;">💡 新方案的设计理念</strong>')
-        formatted_article = formatted_article.replace("**新方案的实现方式**", '<strong style="color: #28a745; font-size: 16px;">🔧 新方案的实现方式</strong>')
-        formatted_article = formatted_article.replace("**探究的问题**", '<strong style="color: #fd7e14; font-size: 16px;">🔍 探究的问题</strong>')
-        formatted_article = formatted_article.replace("**实验结论**", '<strong style="color: #6f42c1; font-size: 16px;">📊 实验结论</strong>')
-        # 将换行符转换为HTML换行
-        formatted_article = formatted_article.replace('\n\n', '<br><br>')
-        formatted_article = formatted_article.replace('\n', '<br>')
 
     block_template = """
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 8px; padding: 16px; background-color: #f9f9f9; margin-bottom: 16px;">
@@ -104,9 +94,9 @@ def get_block_html(title:str, authors:str, rate:str, arxiv_id:str, article:str, 
     </tr>
     <tr>
         <td style="font-size: 14px; color: #555; padding: 12px 0; line-height: 1.6; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 8px 0;">
-            <div style="background-color: #fff; padding: 12px; border-radius: 4px; border-left: 4px solid {type_color};">
-                <strong style="color: #333; font-size: 15px;">📄 Paper Analysis</strong>
-                <div style="margin-top: 8px; text-align: justify;">
+            <div style="background-color: #fff; padding: 16px; border-radius: 6px; border-left: 4px solid {type_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <strong style="color: #333; font-size: 16px; margin-bottom: 12px; display: block;">📄 论文分析</strong>
+                <div style="margin-top: 8px; text-align: justify; line-height: 1.7;">
                     {formatted_article}
                 </div>
             </div>
