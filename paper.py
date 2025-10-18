@@ -237,7 +237,7 @@ class ArxivPaper:
 
         if paper_type == PaperType.SOLUTION_TYPE:
             # 解决方案型论文的提示词 - 输出HTML格式
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要。请使用合适的HTML标签来组织内容，包括标题、段落、列表等。每个部分都要简明易懂，总字数控制在500字左右。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要。请使用美观的HTML标签来组织内容，包括标题、段落、列表等。使用简明易懂的语言和表达，总字数控制在500字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
@@ -260,11 +260,11 @@ class ArxivPaper:
 （说明新方案的具体实现方法和关键技术）
 </div>
 
-请直接输出HTML内容，不要包含任何markdown格式标记。"""
+请直接输出美观的HTML内容。"""
 
         elif paper_type == PaperType.EXPLORATORY_TYPE:
             # 探究型论文的提示词 - 输出HTML格式
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要。请使用合适的HTML标签来组织内容，包括标题、段落、列表等。每个部分都要简明易懂，总字数控制在400字左右。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要。请使用美观的HTML标签来组织内容，包括标题、段落、列表等。使用简明易懂的语言和表达，总字数控制在400字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
@@ -282,7 +282,7 @@ class ArxivPaper:
 （总结实验结果和发现）
 </div>
 
-请直接输出HTML内容，不要包含任何markdown格式标记。"""
+请直接输出美观的HTML内容。"""
 
         else:
             # 未知类型或回退到HTML格式
@@ -299,7 +299,7 @@ class ArxivPaper:
 （请在这里生成论文的摘要内容）
 </div>
 
-请使用{llm.lang}输出，并直接输出HTML内容，不要包含任何markdown格式标记。"""
+请使用{llm.lang}输出，并直接输出HTML内容。"""
 
         article = llm.generate(
             messages=[
