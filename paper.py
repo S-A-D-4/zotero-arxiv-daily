@@ -237,7 +237,7 @@ class ArxivPaper:
 
         if paper_type == PaperType.SOLUTION_TYPE:
             # 解决方案型论文的提示词 - 输出HTML格式
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要。请使用美观的HTML标签来组织内容，包括标题、段落、列表等。使用简明易懂的语言和表达，总字数控制在500字左右。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要。使用简明易懂的语言和表达，总字数控制在500字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
@@ -247,24 +247,24 @@ class ArxivPaper:
 请生成HTML格式的论文分析，包含以下结构：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #dc3545; font-size: 16px; margin-bottom: 8px;">⚠️ 现有方案的缺点</h3>
-（分析当前存在方法或方案的不足）
+（填充：分析当前存在方法或方案的不足）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #007bff; font-size: 16px; margin-bottom: 8px;">💡 新方案的设计理念</h3>
-（阐述新方案的核心思想和设计原则）
+（填充：阐述新方案的核心思想和设计原则）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #28a745; font-size: 16px; margin-bottom: 8px;">🔧 新方案的实现方式</h3>
-（说明新方案的具体实现方法和关键技术）
+（填充：说明新方案的具体实现方法和关键技术）
 </div>
 
-请直接输出美观的HTML内容。"""
+请直接输出HTML，在填充部分可以使用合适美观的HTML标签组织内容。"""
 
         elif paper_type == PaperType.EXPLORATORY_TYPE:
             # 探究型论文的提示词 - 输出HTML格式
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要。请使用美观的HTML标签来组织内容，包括标题、段落、列表等。使用简明易懂的语言和表达，总字数控制在400字左右。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要。使用简明易懂的语言和表达，总字数控制在400字左右。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
@@ -274,19 +274,19 @@ class ArxivPaper:
 请生成HTML格式的论文分析，包含以下结构：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #fd7e14; font-size: 16px; margin-bottom: 8px;">🔍 探究的问题</h3>
-（描述论文要研究或验证的问题）
+（填充：描述论文要研究或验证的问题）
 </div>
 
 <div style="margin-bottom: 20px;">
 <h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 8px;">📊 实验结论</h3>
-（总结实验结果和发现）
+（填充：总结实验结果和发现）
 </div>
 
-请直接输出美观的HTML内容。"""
+请直接输出HTML，在填充部分可以使用合适美观的HTML标签组织内容。"""
 
         else:
             # 未知类型或回退到HTML格式
-            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇论文，并生成HTML格式的摘要。请使用合适的HTML标签来组织内容，包括标题、段落等。总字数控制在600字以内。"
+            system_prompt = "你是一个专业的学术分析师，请仔细阅读这篇论文，并生成HTML格式的摘要。总字数控制在600字以内。"
             user_prompt = f"""论文标题：{self.title}
 
 论文摘要：{self.summary}
