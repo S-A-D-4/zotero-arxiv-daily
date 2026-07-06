@@ -301,6 +301,7 @@ class ArxivPaper:
 
 ---
 
+请仔细阅读这篇解决方案型论文，并生成HTML格式的结构化摘要，不要输出其他内容。使用简明易懂、易于理解的语言和表达，总字数控制在500字左右。
 以下是你需要解读的论文：
 
 论文标题：{self.title}
@@ -341,6 +342,7 @@ class ArxivPaper:
 
 ---
 
+请仔细阅读这篇探究型论文，并生成HTML格式的结构化摘要，不要输出其他内容。使用简明易懂、易于理解的语言和表达，总字数控制在400字左右。
 以下是你需要解读的论文：
 
 论文标题：{self.title}
@@ -366,6 +368,7 @@ class ArxivPaper:
 
 论文完整内容：{full_content}
 
+请仔细阅读这篇论文，并生成HTML格式的摘要，不要输出其他内容。总字数控制在600字以内。
 请生成HTML格式的论文摘要，遵循以下格式：
 <div style="margin-bottom: 20px;">
 <h3 style="color: #333; font-size: 16px; margin-bottom: 8px;">📄 论文摘要</h3>
