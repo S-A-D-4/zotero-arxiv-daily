@@ -309,21 +309,13 @@ class ArxivPaper:
 
 论文完整内容：{full_content}
 
-请生成HTML格式的论文分析，遵循以下结构：
-<div style="margin-bottom: 20px;">
-<h3 style="color: #dc3545; font-size: 16px; margin-bottom: 8px;">⚠️ 现有方案的缺点</h3>
+请生成HTML格式的论文分析，包含以下三部分结构：
+⚠️ 现有方案的缺点
 （填充：分析当前存在方法或方案的不足）
-</div>
-
-<div style="margin-bottom: 20px;">
-<h3 style="color: #007bff; font-size: 16px; margin-bottom: 8px;">💡 新方案的设计理念</h3>
+💡 新方案的设计理念
 （填充：阐述新方案的核心思想和设计原则）
-</div>
-
-<div style="margin-bottom: 20px;">
-<h3 style="color: #28a745; font-size: 16px; margin-bottom: 8px;">🔧 新方案的实现方式</h3>
+🔧 新方案的实现方式
 （填充：说明新方案的具体实现方法和关键技术）
-</div>
 
 请直接输出HTML代码，在填充部分可以使用合适美观的HTML标签格式组织内容。"""
 
@@ -357,16 +349,11 @@ class ArxivPaper:
 
 论文完整内容：{full_content}
 
-请生成HTML格式的论文分析，遵循以下结构：
-<div style="margin-bottom: 20px;">
-<h3 style="color: #fd7e14; font-size: 16px; margin-bottom: 8px;">🔍 探究的问题</h3>
+请生成HTML格式的论文分析，包含以下两部分结构：
+🔍 探究的问题
 （填充：描述论文要研究或验证的问题）
-</div>
-
-<div style="margin-bottom: 20px;">
-<h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 8px;">📊 实验结论</h3>
+📊 实验结论
 （填充：总结实验结果和发现）
-</div>
 
 请直接输出HTML代码，在填充部分可以使用合适美观的HTML标签格式组织内容。"""
 
